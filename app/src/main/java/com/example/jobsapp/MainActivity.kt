@@ -25,6 +25,8 @@ import kotlinx.coroutines.launch
 
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.toObject
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +57,56 @@ fun JobApp() {
 
         composable("home") {
             HomeScreen()
+        }
+        composable("jobs") {
+            JobsScreen()
+        }
+        composable("admin") {
+            AdminUploadScreen()
+        }
+    }
+}
+
+@Composable
+fun JobsScreen() {
+
+    val db = FirebaseFirestore.getInstance()
+    val jobs = remember { mutableStateListOf<Job>() }
+
+    // Listen for real-time updates
+    LaunchedEffect(Unit) {
+        db.collection("jobs")
+            .addSnapshotListener { snapshot, _ ->
+                if (snapshot != null) {
+                    jobs.clear()
+                    for (doc in snapshot.documents) {
+                        val job = doc.toObject(Job::class.java)
+                        if (job != null) jobs.add(job)
+                    }
+                }
+            }
+    }
+
+    Column(modifier = Modifier.padding(16.dp)) {
+
+        Text("Available Jobs", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        jobs.forEach { job ->
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp),
+                shape = RoundedCornerShape(15.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(job.title, fontWeight = FontWeight.Bold)
+                    Text(job.company)
+                    Text(job.location)
+                }
+            }
         }
     }
 }
@@ -214,7 +266,7 @@ fun LoginScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(10.dp))
 
         Button(onClick = {
-            navController.navigate("signup")
+            navController.navigate("admin")
         }) {
             Text("Go to Signup")
         }
