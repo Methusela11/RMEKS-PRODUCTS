@@ -1,14 +1,12 @@
-package com.example.jobsapp
+package com.example.jobsapp.screens
 
-import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.*
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun AdminUploadScreen() {
@@ -19,41 +17,48 @@ fun AdminUploadScreen() {
     var company by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
 
         Text(
             text = "Admin Upload Job",
             fontSize = 22.sp
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        TextField(
+        // Job Title
+        OutlinedTextField(
             value = title,
             onValueChange = { title = it },
             label = { Text("Job Title") },
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        TextField(
+        // Company
+        OutlinedTextField(
             value = company,
             onValueChange = { company = it },
             label = { Text("Company") },
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-        TextField(
+        // Location
+        OutlinedTextField(
             value = location,
             onValueChange = { location = it },
             label = { Text("Location") },
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Button(
             onClick = {
@@ -66,12 +71,12 @@ fun AdminUploadScreen() {
 
                 db.collection("jobs")
                     .add(job)
-
-                // clear fields after upload
-                title = ""
-                company = ""
-                location = ""
-
+                    .addOnSuccessListener {
+                        // Clear fields
+                        title = ""
+                        company = ""
+                        location = ""
+                    }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
